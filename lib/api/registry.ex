@@ -60,15 +60,15 @@ defmodule Hexview.API.Registry do
   ###
   # GenServer API
   ###
-  defp handle_call(:all, _from, state) do
+  def handle_call(:all, _from, state) do
     {:reply, :ets.tab2list(:hex_packages), state}
   end
 
-  defp handle_call({:find_by_name, name}, _from, state) do
+  def handle_call({:find_by_name, name}, _from, state) do
     {:reply, :ets.lookup(:hex_packages, name), state}
   end
 
-  defp handle_cast(:update, state) do
+  def handle_cast(:update, state) do
     fetch()
     {:noreply, state}
   end
