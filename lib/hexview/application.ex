@@ -12,6 +12,7 @@ defmodule Hexview.Application do
       supervisor(HexviewWeb.Endpoint, []),
       # Start your own worker by calling: Hexview.Worker.start_link(arg1, arg2, arg3)
       # worker(Hexview.Worker, [arg1, arg2, arg3]),
+      worker(Hexview.API.Registry, [])
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
