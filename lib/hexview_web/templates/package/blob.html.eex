@@ -1,0 +1,6 @@
+<p>
+  Showing file: <%= @file.name %>
+</p>
+<pre class="codes">
+  <%= @file.content %>
+</pre>
