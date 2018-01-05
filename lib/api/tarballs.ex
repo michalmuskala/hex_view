@@ -6,6 +6,8 @@ defmodule Hexview.API.Tarballs do
   use GenServer
 
   @baseurl "https://repo.hex.pm/tarballs/"
+  @hex_tarballs "db/hex_tarballs"
+  @hex_packages "db/hex_packages"
 
   def init(args) do
     :inets.start()
@@ -65,15 +67,17 @@ defmodule Hexview.API.Tarballs do
     {:ok, {{_, 200, 'OK'}, _headers, body}} =
       :httpc.request(:get, {url, []}, [], body_format: :binary)
 
-    File.write!("db/hex_tarballs/#{tar}", body)
+    File.write!(Path.join(@hex_tarballs, tar), body)
 
     :ets.insert(:hex_tarballs, {rootname, true})
+
+    extract_compressed_file(tar)
 
     {:noreply, state}
   end
 
   defp scan_disk() do
-    case File.ls("db/hex_tarballs") do
+    case File.ls(@hex_tarballs) do
       {:ok, pkgs} ->
         pkgs
         |> Enum.each(fn pkg ->
@@ -85,5 +89,17 @@ defmodule Hexview.API.Tarballs do
       {:error, e} ->
         {:error, e}
     end
+  end
+
+  # TODO move into a seperate GenServer
+  defp extract_compressed_file(file) do
+    :erl_tar.extract(Path.join([@hex_tarballs, file]), [
+      {:cwd, Path.join([@hex_packages, Path.rootname(file)])}
+    ])
+
+    :erl_tar.extract(Path.join([@hex_packages, Path.rootname(file), "contents.tar.gz"]), [
+      :compressed,
+      {:cwd, Path.join([@hex_packages, Path.rootname(file), "src"])}
+    ])
   end
 end
