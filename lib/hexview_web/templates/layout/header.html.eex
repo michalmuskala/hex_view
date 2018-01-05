@@ -1,0 +1,13 @@
+<header class="navbar">
+  <section class="navbar-section">
+    <%= link("HexView", to: page_path(@conn, :index), class: "navbar-brand mr-2") %>
+  </section>
+  <section class="navbar-section">
+    <a href="https://github.com/michalmuskala/hex_view" class="btn btn-link mr-1">GitHub</a>
+    <a href="https://hex.pm" class="btn btn-link mr-2">hex.pm</a>
+    <div class="input-group input-inline">
+      <input class="form-input" type="text" placeholder="Package...">
+      <button class="btn btn-primary input-group-btn">Search</button>
+    </div>
+  </section>
+</header>
