@@ -1,7 +1,22 @@
 <p>Showing Package: <%= @name %></p>
 
-<%= for file <- @files do %>
-  <ul>
-    <li><%= file %></li>
-  </ul>
-<% end %>
+<table class="files">
+  <tbody>
+    <%= for file <- @files do %>
+      <tr>
+        <%= if file.is_directory do %>
+          <td>
+            <%= img_tag(static_path(@conn, "/images/file-directory.svg")) %>
+            <%= link(file.name, to: package_path(@conn, :tree, @name, [file.name])) %>
+          </td>
+        <% else %>
+          <td>
+            <%= img_tag(static_path(@conn, "/images/file-text.svg")) %>
+            <%= link(file.name, to: package_path(@conn, :blob, @name, [file.name])) %>
+          </td>
+        <% end %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+

@@ -19,6 +19,9 @@ defmodule HexviewWeb.Router do
     get "/", PageController, :index
 
     get "/packages/:name", PackageController, :show
+    get "/packages/:name/tree", PackageController, :show
+    get "/packages/:name/tree/*path", PackageController, :tree
+    get "/packages/:name/blob/*path", PackageController, :blob
   end
 
   # Other scopes may use custom stacks.
