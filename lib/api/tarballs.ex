@@ -20,6 +20,13 @@ defmodule Hexview.API.Tarballs do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
+  @doc """
+  Download a special version package into db/hex_tarballs/ directory
+
+  If cached, never download again.
+
+      Hexview.API.Tarballs.download("ecto", "2.2.7")
+  """
   def download(name, version) do
     if cached?(name, version) do
       {:ok, "but we have cached #{name}-#{version}.tar"}
@@ -28,6 +35,13 @@ defmodule Hexview.API.Tarballs do
     end
   end
 
+  @doc """
+  check a special version pacakge
+
+  If cached, return true. Otherwise, false.
+
+      Hexview.API.Tarballs.cached?("ecto", "2.2.7")
+  """
   def cached?(name, version) do
     case GenServer.call(__MODULE__, {:find_by_tar, {name, version}}) do
       [{_, true}] -> true
