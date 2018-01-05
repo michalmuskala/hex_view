@@ -13,6 +13,9 @@ defmodule Hexview.API.Tarballs do
     :inets.start()
     :ets.new(:hex_tarballs, [:set, :protected, :named_table])
 
+    File.mkdir_p(@hex_tarballs)
+    File.mkdir_p(@hex_packages)
+
     scan_disk()
 
     {:ok, args}
@@ -46,8 +49,20 @@ defmodule Hexview.API.Tarballs do
   """
   def cached?(name, version) do
     case GenServer.call(__MODULE__, {:find_by_tar, {name, version}}) do
-      [{_, true}] -> true
+      [{_, _}] -> true
       [] -> false
+    end
+  end
+
+  @doc """
+  get all paths under packge src directory
+
+      Hexview.API.Tarballs.get_paths("ecto", "2.2.7")
+  """
+  def get_paths(name, version) do
+    case GenServer.call(__MODULE__, {:find_by_tar, {name, version}}) do
+      [{_, xs}] -> xs
+      [] -> []
     end
   end
 
@@ -69,20 +84,30 @@ defmodule Hexview.API.Tarballs do
 
     File.write!(Path.join(@hex_tarballs, tar), body)
 
-    :ets.insert(:hex_tarballs, {rootname, true})
-
     extract_compressed_file(tar)
+
+    :ets.insert(
+      :hex_tarballs,
+      {rootname, Path.wildcard(Path.join([@hex_packages, rootname, "src", "**", "*"]))}
+    )
 
     {:noreply, state}
   end
 
+  # rebuild ets table from local cached packages
   defp scan_disk() do
     case File.ls(@hex_tarballs) do
       {:ok, pkgs} ->
         pkgs
         |> Enum.each(fn pkg ->
           if Path.extname(pkg) == ".tar" do
-            :ets.insert(:hex_tarballs, {Path.rootname(pkg), true})
+            :ets.insert(
+              :hex_tarballs,
+              {
+                Path.rootname(pkg),
+                Path.wildcard(Path.join([@hex_packages, Path.rootname(pkg), "src", "**", "*"]))
+              }
+            )
           end
         end)
 
