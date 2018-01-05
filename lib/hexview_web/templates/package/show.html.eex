@@ -1,1 +1,7 @@
 <p>Showing Package: <%= @name %></p>
+
+<%= for file <- @files do %>
+  <ul>
+    <li><%= file %></li>
+  </ul>
+<% end %>
