@@ -36,7 +36,7 @@ defmodule Hexview.API.Tarballs do
     if cached?(name, version) do
       {:ok, "but we have cached #{name}-#{version}.tar"}
     else
-      GenServer.cast(__MODULE__, {:download, {name, version}})
+      GenServer.call(__MODULE__, {:download, {name, version}})
     end
   end
 
@@ -59,7 +59,7 @@ defmodule Hexview.API.Tarballs do
 
       Hexview.API.Tarballs.get_paths("ecto", "2.2.7")
   """
-  def get_paths(name, version) do
+  def get_path(name, version) do
     case GenServer.call(__MODULE__, {:find_by_tar, {name, version}}) do
       [{_, xs}] -> xs
       [] -> []
@@ -74,7 +74,7 @@ defmodule Hexview.API.Tarballs do
     {:reply, :ets.lookup(:hex_tarballs, "#{name}-#{version}"), state}
   end
 
-  def handle_cast({:download, {name, version}}, state) do
+  def handle_call({:download, {name, version}}, _from, state) do
     rootname = "#{name}-#{version}"
     tar = rootname <> ".tar"
     url = to_charlist(@baseurl <> tar)
@@ -88,10 +88,10 @@ defmodule Hexview.API.Tarballs do
 
     :ets.insert(
       :hex_tarballs,
-      {rootname, Path.wildcard(Path.join([@hex_packages, rootname, "src", "**", "*"]))}
+      {rootname, Path.join([@hex_packages, rootname])}
     )
 
-    {:noreply, state}
+    {:reply, {:ok, "download complete"}, state}
   end
 
   # rebuild ets table from local cached packages
@@ -105,7 +105,7 @@ defmodule Hexview.API.Tarballs do
               :hex_tarballs,
               {
                 Path.rootname(pkg),
-                Path.wildcard(Path.join([@hex_packages, Path.rootname(pkg), "src", "**", "*"]))
+                Path.join([@hex_packages, Path.rootname(pkg)])
               }
             )
           end

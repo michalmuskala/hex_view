@@ -7,12 +7,12 @@
         <%= if file.is_directory do %>
           <td>
             <%= img_tag(static_path(@conn, "/images/file-directory.svg")) %>
-            <%= link(file.name, to: package_path(@conn, :tree, @name, [file.name])) %>
+            <%= link(file.name, to: package_path(@conn, :tree, @name, @version, [file.name])) %>
           </td>
         <% else %>
           <td>
             <%= img_tag(static_path(@conn, "/images/file-text.svg")) %>
-            <%= link(file.name, to: package_path(@conn, :blob, @name, [file.name])) %>
+            <%= link(file.name, to: package_path(@conn, :blob, @name, @version, [file.name])) %>
           </td>
         <% end %>
       </tr>

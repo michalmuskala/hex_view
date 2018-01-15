@@ -1,0 +1,12 @@
+<h1>All Packages</h1>
+<%= for package <- @packages do %>
+  <% name = elem(package, 0) %>
+  <p><%= name %></p>
+  <ul>
+    <%= for version <- elem(package, 2) do %>
+      <li>
+        <%= link(version, to: package_path(@conn, :show, name, version)) %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>

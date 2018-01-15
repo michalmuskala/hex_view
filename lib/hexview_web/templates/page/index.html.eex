@@ -1,7 +1,0 @@
-<h3>Listing packages</h3>
-
-<ul>
-  <%= for package <- ["poison", "cowboy", "cowlib", "plug"] do %>
-    <li><%= link(package, to: package_path(@conn, :show, package)) %></li>
-  <% end %>
-</ul>

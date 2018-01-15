@@ -1,13 +1,15 @@
 defmodule Hexview.Package do
-  @package_directory "priv/packages/"
+  @package_directory "db/hex_packages"
 
-  def list_files(package) do
-    {:ok, files} = File.ls(path(package))
+  alias Hexview.API.Tarballs
+
+  def list_files(package, version) do
+    {:ok, files} = File.ls(path(package, version))
     Enum.map(files, &to_map/1)
   end
 
-  def list_files(package, dir) do
-    {:ok, files} = File.ls(path(package, dir))
+  def list_files(package, version, dir) do
+    {:ok, files} = File.ls(path(package, version, dir))
     Enum.map(files, &to_map/1)
   end
 
@@ -18,12 +20,23 @@ defmodule Hexview.Package do
     }
   end
 
-  def fetch_file(package, dir) do
-    {:ok, binary} = File.read(path(package, dir))
+  def fetch_file(package, version, dir) do
+    {:ok, binary} = File.read(path(package, version, dir))
 
     %{name: Path.basename(dir), content: binary}
   end
 
-  defp path(package), do: "#{@package_directory}/#{package}"
-  defp path(package, dir), do: "#{@package_directory}/#{package}/#{dir}"
+  def package_exists?(name, version) do
+    if Tarballs.cached?(name, version) do
+      true
+    else
+      case Tarballs.download(name, version) do
+        {:ok, _msg} -> true
+        _ -> false
+      end
+    end
+  end
+
+  defp path(package, version), do: "#{@package_directory}/#{package}-#{version}/src"
+  defp path(package, version, dir), do: "#{@package_directory}/#{package}-#{version}/src/#{dir}"
 end
