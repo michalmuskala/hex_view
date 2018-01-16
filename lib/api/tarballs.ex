@@ -34,7 +34,7 @@ defmodule Hexview.API.Tarballs do
   """
   def download(name, version) do
     if cached?(name, version) do
-      {:ok, "but we have cached #{name}-#{version}.tar"}
+      {:ok, {:cached, name, version}}
     else
       GenServer.call(__MODULE__, {:download, {name, version}})
     end
@@ -91,7 +91,7 @@ defmodule Hexview.API.Tarballs do
       {rootname, Path.join([@hex_packages, rootname])}
     )
 
-    {:reply, {:ok, "download complete"}, state}
+    {:reply, {:ok, {:download, name, version}}, state}
   end
 
   # rebuild ets table from local cached packages

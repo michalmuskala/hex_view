@@ -1,12 +1,24 @@
 <h1>All Packages</h1>
-<%= for package <- @packages do %>
-  <% name = elem(package, 0) %>
-  <p><%= name %></p>
-  <ul>
-    <%= for version <- elem(package, 2) do %>
-      <li>
-        <%= link(version, to: package_path(@conn, :show, name, version)) %>
-      </li>
+<table class="table table-striped table-hover">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Versions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <%= for package <- @packages do %>
+        <% name = elem(package, 0) %>
+        <% versions = elem(package, 2) %>
+        <% latest = hd(versions) %>
+        <tr>
+            <td><%= link(name, to: package_path(@conn, :show, name, latest)) %> <sup><%= latest %></sup></td>
+            <td>
+                <%= for version <- versions do %>
+                <%= link(version, to: package_path(@conn, :show, name, version)) %>, 
+                <% end %>
+            </td>
+        </tr>
     <% end %>
-  </ul>
-<% end %>
+  </tbody>
+</table>

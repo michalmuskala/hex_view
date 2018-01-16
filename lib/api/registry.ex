@@ -79,7 +79,7 @@ defmodule Hexview.API.Registry do
 
     :hex_registry.decode_versions(body)[:packages]
     |> Enum.each(fn %{:name => name, :retired => retired, :versions => versions} ->
-      :ets.insert(:hex_packages, {name, retired, versions})
+      :ets.insert(:hex_packages, {name, retired, Enum.sort(versions, &(&1 >= &2))})
     end)
   end
 end
