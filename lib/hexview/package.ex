@@ -10,13 +10,21 @@ defmodule Hexview.Package do
 
   def list_files(package, version, dir) do
     {:ok, files} = File.ls(path(package, version, dir))
-    Enum.map(files, &to_map/1)
+    Enum.map(files, fn file -> to_map(package, version, dir, file) end)
   end
 
-  defp to_map(path) do
+
+  defp to_map(filename) do
     %{
-      name: path,
-      is_directory: File.dir?(path),
+      name: filename,
+      is_directory: File.dir?(filename)
+    }
+  end
+
+  defp to_map(package, version, dir, filename) do
+    %{
+      name: dir,
+      is_directory: File.dir?(path(package, version, dir, filename)),
     }
   end
 
@@ -39,4 +47,5 @@ defmodule Hexview.Package do
 
   defp path(package, version), do: "#{@package_directory}/#{package}-#{version}/src"
   defp path(package, version, dir), do: "#{@package_directory}/#{package}-#{version}/src/#{dir}"
+  defp path(package, version, dir, filename), do: "#{@package_directory}/#{package}-#{version}/src/#{dir}/#{filename}"
 end
