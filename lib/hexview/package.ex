@@ -13,7 +13,6 @@ defmodule Hexview.Package do
     Enum.map(files, fn file -> to_map(package, version, dir, file) end)
   end
 
-
   defp to_map(filename) do
     %{
       name: filename,
@@ -23,7 +22,7 @@ defmodule Hexview.Package do
 
   defp to_map(package, version, dir, filename) do
     %{
-      name: dir,
+      name: filename,
       is_directory: File.dir?(path(package, version, dir, filename)),
     }
   end
